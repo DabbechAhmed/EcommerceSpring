@@ -2,6 +2,7 @@ package com.pleaseWorkNow.hope.service.product;
 
 import com.pleaseWorkNow.hope.dto.ImageDto;
 import com.pleaseWorkNow.hope.dto.ProductDto;
+import com.pleaseWorkNow.hope.exceptions.AlreadyExistsException;
 import com.pleaseWorkNow.hope.exceptions.ProductNotfoundException;
 import com.pleaseWorkNow.hope.model.Category;
 import com.pleaseWorkNow.hope.model.Image;
@@ -33,6 +34,9 @@ public class ProductService implements IProductService {
         // if yes, set the category to the product
         // if no, create a new category and set it to the product
         // then save the product
+        if (productExist(request.getName(), request.getBrand()))
+            throw new AlreadyExistsException(request.getBrand()+" "+request.getName()+" already exists, you may want to update it instead");
+        
         Category category= Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() ->
                 {
@@ -41,6 +45,10 @@ public class ProductService implements IProductService {
                 });
         request.setCategory(category);
         return productRepository.save(createProduct(request, category));
+    }
+
+    private boolean productExist(String name, String brand){
+        return productRepository.existsByNameAndBrand(name,brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category){
