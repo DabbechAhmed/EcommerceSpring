@@ -1,4 +1,4 @@
-package com.pleaseWorkNow.hope.config;
+package com.pleaseWorkNow.hope.security.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

@@ -19,4 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Long countProductByBrandAndName(String brand, String name);
 
     List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
+
+    boolean existsByNameAndBrand(String name, String brand);
 }

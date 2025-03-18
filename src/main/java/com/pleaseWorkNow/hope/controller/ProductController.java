@@ -1,6 +1,7 @@
 package com.pleaseWorkNow.hope.controller;
 
 import com.pleaseWorkNow.hope.dto.ProductDto;
+import com.pleaseWorkNow.hope.exceptions.AlreadyExistsException;
 import com.pleaseWorkNow.hope.exceptions.ProductNotfoundException;
 import com.pleaseWorkNow.hope.model.Product;
 import com.pleaseWorkNow.hope.request.AddProductRequest;
@@ -13,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -46,8 +46,8 @@ public class ProductController {
             Product theProduct = productService.addProduct(product);
             ProductDto convertedProduct = productService.convertToDto(theProduct);
             return ResponseEntity.ok(new ApiResponse("Product added successfully", convertedProduct));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
+        } catch (AlreadyExistsException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
