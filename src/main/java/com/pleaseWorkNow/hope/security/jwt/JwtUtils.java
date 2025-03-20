@@ -31,7 +31,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject(userPrincipal.getEmail())
                 .claim("id", userPrincipal.getId())
-                .claim("roles", roles) // Any information you want to add pass it here as a claim
+                .claim("roles", roles)// Any information you want to add pass it here as a claim
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();

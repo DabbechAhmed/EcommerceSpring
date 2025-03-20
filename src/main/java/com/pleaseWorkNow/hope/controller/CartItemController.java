@@ -9,11 +9,13 @@ import com.pleaseWorkNow.hope.service.cart.CartService;
 import com.pleaseWorkNow.hope.service.cart.ICartItemService;
 import com.pleaseWorkNow.hope.service.cart.ICartService;
 import com.pleaseWorkNow.hope.service.user.IUserService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +29,15 @@ public class CartItemController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addItemToCart(@RequestParam Long productId, @RequestParam Integer quantity) {
         try {
-            User user = userService.getUserById(2L);
+            User user = userService.getAuthenticatedUser();
             Cart cart = cartService.initializeCart(user);
 
             cartItemService.addCarItem(cart.getId(), productId, quantity);
             return ResponseEntity.ok(new ApiResponse("Item added to cart successfully", null));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }catch (JwtException e){
+            return ResponseEntity.status(UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));
         }
     }
 

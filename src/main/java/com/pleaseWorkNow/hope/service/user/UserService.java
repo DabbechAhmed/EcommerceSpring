@@ -9,6 +9,9 @@ import com.pleaseWorkNow.hope.request.CreateUserRequest;
 import com.pleaseWorkNow.hope.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,6 +21,7 @@ import java.util.Optional;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User getUserById(Long id) {
@@ -31,7 +35,7 @@ public class UserService implements IUserService {
             user.setFirstName(req.getFirstName());
             user.setLastName(req.getLastName());
             user.setEmail(req.getEmail());
-            user.setPassword(req.getPassword());
+            user.setPassword(passwordEncoder.encode(req.getPassword()));
             return userRepository.save(user);
         }).orElseThrow(() -> new AlreadyExistsException("Oops!"+request.getEmail() + " already exists!"));
     }
@@ -57,5 +61,11 @@ public class UserService implements IUserService {
     @Override
     public UserDto convertUserToDto(User user){
         return modelMapper.map(user,UserDto.class);
+    }
+
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email);
     }
 }
